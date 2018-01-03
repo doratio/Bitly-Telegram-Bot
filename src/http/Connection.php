@@ -1,11 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: doratio
- * Date: 02.01.2018
- * Time: 19:15
- */
-
 class Connection
 {
 
@@ -14,7 +7,7 @@ class Connection
     /**
      * Bot constructor.
      * @param $token
-     * @param $urlTelegram
+     * @param $url
      */
     public function __construct($token, $url)
     {
@@ -23,21 +16,23 @@ class Connection
 
     public function request($method, $params=[])
     {
+        $url=$this->url."/$method";
         $vars = null;
         if (!empty($params)) {
             $vars = http_build_query($params);
+            $this->url.="?$vars";
         }
 
         $options = array(
             'http' => array(
-                'method'  => 'POST',  // метод передачи данных
+                'method'  => 'GET',  // метод передачи данных
                 'header'  => 'Content-type: application/x-www-form-urlencoded',  // заголовок
-                'content' => $vars,  // переменные
+//                'content' => $vars,  // переменные
             )
         );
 
         $context  = stream_context_create($options);  // создаём контекст потока
-        $result = file_get_contents("$this->url/$method", false, $context); //отправляем запрос
+        $result = file_get_contents($url, false, $context); //отправляем запрос
 
         return json_decode($result);
     }
