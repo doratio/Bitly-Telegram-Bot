@@ -22,12 +22,13 @@ class Bot
 
     public function getUpdates()
     {
-        return "111".$this->connection->request("getUpdates",null);
+        return $this->connection->request("getUpdates",null);
     }
 
-    public function sendMessage($text)
+    public function sendMessage($text, $chatID)
     {
         $params["text"] = $text;
+        $params["chat_id"] = $chatID;
         $this->connection->request("sendmessage", $params);
     }
 }
