@@ -48,8 +48,8 @@ class RestApi
     public function getExistLinks($offset = 0)
     {
         return $this->connection->request("v3/user/link_history", [
-            'offset' => $offset,
-            'limit' => 10
+            'offset' => 3,
+            'limit' => 3
         ])['data']['link_history'];
     }
 

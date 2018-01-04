@@ -4,7 +4,6 @@ require_once 'Logger.php';
 class FLogger extends Logger
 {
     public $file;
-    public $lines = [];
 
     public function __construct($fn)
     {
