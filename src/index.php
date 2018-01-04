@@ -1,9 +1,13 @@
 <?php
 require('telegram/Bot.php');
+require('bitly/RestApi.php');
 require('Log/FLogger.php');
 
 $log = new FLogger("log.txt");
 $bot = new \telegram\Bot();
+$bitlyApi = new bitly\RestApi();
+
+$bitlyApi->getExistLinks();
 
 $log->log("запрос на обновление");
 
