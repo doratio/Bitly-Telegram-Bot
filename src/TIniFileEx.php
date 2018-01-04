@@ -10,11 +10,11 @@ if (!defined('_BR_'))
  */
 class TIniFileEx {
     /**
-     * @var
+     * @var string
      */
     public $filename;
     /**
-     * @var
+     * @var array
      */
     public $arr;
 
@@ -28,13 +28,14 @@ class TIniFileEx {
     }
 
     /**
-     *
+     *  парсит файл c расширением ini
      */
     function initArray(){
         $this->arr = parse_ini_file($this->filename, true);
     }
 
     /**
+     * оболочка метода initArray, для проверики на существование файла
      * @param $file
      * @return bool
      */
@@ -50,9 +51,10 @@ class TIniFileEx {
     }
 
     /**
+     * читает из ini файла определенное значение
      * @param $section
      * @param $key
-     * @param string $def
+     * @param string $def значение возвращающие по умолчанию
      * @return string
      */
     function read($section, $key, $def = ''){
@@ -63,6 +65,7 @@ class TIniFileEx {
     }
 
     /**
+     *  записывает в ini файл новое значение или изменяет старое;
      * @param $section
      * @param $key
      * @param $value
@@ -74,45 +77,7 @@ class TIniFileEx {
     }
 
     /**
-     * @param $section
-     */
-    function eraseSection($section){
-        if (isset($this->arr[$section]))
-            unset($this->arr[$section]);
-    }
-
-    /**
-     * @param $section
-     * @param $key
-     */
-    function deleteKey($section, $key){
-        if (isset($this->arr[$section][$key]))
-            unset($this->arr[$section][$key]);
-    }
-
-    /**
-     * @param $array
-     * @return array
-     */
-    function readSections(&$array){
-        $array = array_keys($this->arr);
-        return $array;
-    }
-
-    /**
-     * @param $section
-     * @param $array
-     * @return array
-     */
-    function readKeys($section, &$array){
-        if (isset($this->arr[$section])){
-            $array = array_keys($this->arr[$section]);
-            return $array;
-        }
-        return array();
-    }
-
-    /**
+     * записывает все строки в файл
      * @return bool
      */
     function updateFile(){
@@ -131,7 +96,7 @@ class TIniFileEx {
     }
 
     /**
-     *
+     *TIniFileEx destruct
      */
     function __destruct(){
         $this->updateFile();
