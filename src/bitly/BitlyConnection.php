@@ -11,7 +11,7 @@ class BitlyConnection {
 
   }
 
-  public function request ($method, $params=[]) {
+  public function request ($method, $params = []) {
     $url = "$this->url/$method";
     $params['access_token'] = $this->token;
     $content = null;
@@ -21,14 +21,12 @@ class BitlyConnection {
     $options = array(
       'http' => array(
         'method' => 'GET',
-        'header' => 'Content-type: application/x-www-form-urlencoded',
+        'header' => 'Content-Type: application/x-www-form-urlencoded',
         'content' => $content
       )
     );
-
     $context = stream_context_create($options);
     $result = file_get_contents($url, false, $context);
-
     return json_decode($result, true);
   }
 

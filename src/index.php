@@ -7,10 +7,16 @@ require('bitly/RestApi.php');
 require('Log/FLogger.php');
 
 $log = new FLogger("log.txt");
-$bot = new \telegram\Bot();
+$bot = new \telegram\Bot($log);
 $bitlyApi = new bitly\RestApi();
 
-$bitlyApi->getExistLinks();
+$history = $bitlyApi->getExistLinks();
+$content = "История созданных ссылок: \n\n";
+foreach ($history as $i) {
+  $content .= $i['title'] . "\n";
+  $content .= "🔗 " . $i['long_url'] ."\n\n". "➡ ". $i['link'] . "\n---------\n";
+}
+$bot->sendMessage($content, '321121687');
 
 $log->log("запрос на обновление");
 
@@ -49,7 +55,7 @@ $inlineKeyboards = [
             ],
             (object)[
                 "text" => ">",
-                "callback_data" => "google.com"
+                "callback_data" => 'google.com'
             ]
         ]
     ]
