@@ -5,7 +5,7 @@
 require('telegram/Bot.php');
 require('Log/FLogger.php');
 
-$log = new FLogger("log.txt");
+$log = new FLogger("Log/log.txt");
 $bot = new \telegram\Bot($log);
 
 $log->log("запрос на обновление");
@@ -22,7 +22,7 @@ $log->log("запрос прошел");
 
 
 $log->log("отправляем сообщение");
-//$bot->sendMessage("hello", $chat_id);
+$bot->sendMessage("hello", $chat_id);
 $log->log("сообщение отправлено");
 
 $log->log("создание клавиатуры");
@@ -32,3 +32,24 @@ $keyboardSettings = array(
 );
 $bot->keyboard(" f", $chat_id, $keyboards, $keyboardSettings);
 $log->log("клавиатура создана");
+
+$log->log("создание ярлыка");
+
+$inlineKeyboards = [
+    "inline_keyboard" => [
+        [
+            (object)[
+                "text" => "<",
+                "callback_data" => "google.com"
+
+            ],
+            (object)[
+                "text" => ">",
+                "callback_data" => "google.com"
+            ]
+        ]
+    ]
+];
+
+$bot->inlineKeyboard(" f", $chat_id, $inlineKeyboards);
+$log->log("ярлык создан");

@@ -46,4 +46,14 @@ class Bot
 
         $this->connection->request("sendmessage", $params);
     }
+
+    public function inlineKeyboard($text, $chatID, $inlineKeyboards)
+    {
+        $this->log->log(json_encode($inlineKeyboards));
+        $params["text"] = $text;
+        $params["chat_id"] = $chatID;
+        $params["reply_markup"] = json_encode($inlineKeyboards);
+
+        $this->connection->request("sendmessage", $params);
+    }
 }
