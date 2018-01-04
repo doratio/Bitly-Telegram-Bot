@@ -13,12 +13,14 @@ class Bot
     private $config;
     private $configTelegram;
     private $lastupdate;
+    private $users;
 
     /**
      * Bot constructor.
      */
     public function __construct()
     {
+        $this->users = new \TIniFileEx("Log/users.ini");
         $this->config = new \TIniFileEx("config.ini");
         $this->configTelegram = new \TIniFileEx("telegram/config.ini");
 
@@ -80,6 +82,7 @@ class Bot
             echo "<pre>";
             var_dump($updates);
             echo "</pre>";
+
             $chat_id = null;
             $chat = null;
             $message = null;
@@ -91,9 +94,24 @@ class Bot
                 $chat_id = ((array)$chat)["id"];
                 $this->log->log("id чата: " . $chat_id);
                 $message = ((array)((array)$update)["message"])["text"];
+                $user = ((array)((array)((array)$update)["message"])["from"]);
 
                 switch ($message) {
                     case "/start":
+                        if ($user["id"] != null &&
+                            $user["id"] != null &&
+                            $this->users->read($user["id"],"chat_id", null) != $chat_id)
+                        {
+
+                            $this->users->write($user["id"], "first_name", $user["first_name"]);
+                            $this->users->write($user["id"], "last_name", $user["last_name"]);
+                            $this->users->write($user["id"], "username", $user["username"]);
+                            $this->users->write($user["id"], "language", $user["language_code"]);
+                            $this->users->write($user["id"], "chat_id", $chat_id);
+
+                            $this->users->updateFile();
+                        }
+
                         $this->log->log("создание клавиатуры");
                         $keyboards = [["История"], ["Помощь"]];
                         $keyboardSettings = array(
