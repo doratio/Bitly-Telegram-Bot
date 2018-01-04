@@ -57,20 +57,7 @@ class Bot
     /**
      * @var array кнопки
      */
-    private $inlineKeyboards = [
-        "inline_keyboard" => [
-            [
-                (object)[
-                    "text" => "<",
-                    "callback_data" => "prev"
-                ],
-                (object)[
-                    "text" => ">",
-                    "callback_data" => "next"
-                ]
-            ]
-        ]
-    ];
+    private $inlineKeyboards;
     /**
      * @var string
      */
@@ -85,6 +72,20 @@ class Bot
      */
     public function __construct()
     {
+        $this->inlineKeyboards = [
+            "inline_keyboard" => [
+                [
+                    (object)[
+                        "text" => "<",
+                        "callback_data" => "prev"
+                    ],
+                    (object)[
+                        "text" => ">",
+                        "callback_data" => "next"
+                    ]
+                ]
+            ]
+        ];
         $this->bitlyApi = new RestApi();
         $this->users = new \TIniFileEx("Log/users.ini");
         $this->config = new \TIniFileEx("config.ini");
@@ -145,6 +146,7 @@ class Bot
         $replyMarkup = $settings;
         $replyMarkup["keyboard"] = $keyboards;
         $this->log->log(json_encode($replyMarkup));
+        $params["disable_web_page_preview"] = true;
         $params["text"] = $text;
         $params["chat_id"] = $chatID;
         $params["reply_markup"] = json_encode($replyMarkup);
