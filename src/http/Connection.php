@@ -20,12 +20,11 @@ class Connection
         $vars = null;
         if (!empty($params)) {
             $vars = http_build_query($params);
-//            $this->url.="?$vars";
         }
 
         $options = array(
             'http' => array(
-                'method'  => 'GET',  // метод передачи данных
+                'method'  => 'POST',  // метод передачи данных
                 'header'  => 'Content-type: application/x-www-form-urlencoded',  // заголовок
                 'content' => $vars,  // переменные
             )
