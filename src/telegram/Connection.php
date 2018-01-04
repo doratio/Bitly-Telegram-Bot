@@ -1,4 +1,6 @@
 <?php
+namespace telegram;
+
 class Connection
 {
 
