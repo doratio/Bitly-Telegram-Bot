@@ -186,6 +186,23 @@ class Bot
     }
 
     /**
+     *
+     * Возвращает отформатированную строку списка истории
+     *
+     * @param $history Массив ссылок
+     * @return string Отформатированная строка со списком ссылок
+     */
+    private function renderHistory ($history)
+    {
+        $content = "История созданных ссылок: \n\n";
+        foreach ($history as $i) {
+            $content .= $i['title'] . "\n";
+            $content .= "🔗 " . $i['long_url'] . "\n\n" . "➡ " . $i['link'] . "\n---------\n";
+        }
+        return $content;
+    }
+
+    /**
      * Запускает чат-бота
      */
     public function run()
@@ -206,6 +223,7 @@ class Bot
 
             foreach ($updates as $update) {
                 $update_id = ((array)$update)["update_id"];
+                var_dump(((array)$update)["callback_query"]);
                 if (((array)$update)["callback_query"] === null) {
                     $have_callback_query = false;
                     $chat = ((array)((array)$update)["message"])["chat"];
@@ -253,11 +271,8 @@ class Bot
                         $this->log->log("создание ярлыка");
 
                         $history = $this->bitlyApi->getExistLinks();
-                        $content = "История созданных ссылок: \n\n";
-                        foreach ($history as $i) {
-                            $content .= $i['title'] . "\n";
-                            $content .= "🔗 " . $i['long_url'] . "\n\n" . "➡ " . $i['link'] . "\n---------\n";
-                        }
+
+                        $content = $this->renderHistory($history);
 
                         $inlineKeyboards = [
                             "inline_keyboard" => [
@@ -298,12 +313,8 @@ class Bot
                             $history = $this->bitlyApi->getExistLinks(
                                 $this->historyindex["$message_id"]["offset"]
                             );
-
-                            $content = "История созданных ссылок: \n\n";
-                            foreach ($history as $i) {
-                                $content .= $i['title'] . "\n";
-                                $content .= "🔗 " . $i['long_url'] . "\n\n" . "➡ " . $i['link'] . "\n---------\n";
-                            }
+                            
+                            $content = $this->renderHistory($history);
 
                             $inlineKeyboards = [
                                 "inline_keyboard" => [
@@ -338,12 +349,8 @@ class Bot
                                 $this->historyindex["$message_id"]["offset"] -= 3;
                                 break ;
                             }
-                            if(count($history) == 0)
-                            $content = "История созданных ссылок: \n\n";
-                            foreach ($history as $i) {
-                                $content .= $i['title'] . "\n";
-                                $content .= "🔗 " . $i['long_url'] . "\n\n" . "➡ " . $i['link'] . "\n---------\n";
-                            }
+
+                            $content = $this->renderHistory($history);
 
                             $inlineKeyboards = [
                                 "inline_keyboard" => [

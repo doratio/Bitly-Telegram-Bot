@@ -10,7 +10,7 @@ if (!defined('_BR_'))
  */
 class TIniFileEx {
     /**
-     * @var string
+     * @var string Название файла
      */
     public $filename;
     /**
@@ -28,14 +28,14 @@ class TIniFileEx {
     }
 
     /**
-     *  парсит файл c расширением ini
+     *  Парсит файл c расширением ini
      */
     function initArray(){
         $this->arr = parse_ini_file($this->filename, true);
     }
 
     /**
-     * оболочка метода initArray, для проверики на существование файла
+     * Оболочка метода initArray, для проверки на существование файла
      * @param $file
      * @return bool
      */
@@ -51,7 +51,7 @@ class TIniFileEx {
     }
 
     /**
-     * читает из ini файла определенное значение
+     * Читает из ini файла определенное значение
      * @param $section
      * @param $key
      * @param string $def значение возвращающие по умолчанию
@@ -65,7 +65,7 @@ class TIniFileEx {
     }
 
     /**
-     *  записывает в ini файл новое значение или изменяет старое;
+     * Записывает в ini файл новое значение или изменяет старое;
      * @param $section
      * @param $key
      * @param $value
@@ -77,7 +77,7 @@ class TIniFileEx {
     }
 
     /**
-     * записывает все строки в файл
+     * Записывает все строки в файл
      * @return bool
      */
     function updateFile(){
