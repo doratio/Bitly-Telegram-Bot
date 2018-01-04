@@ -1,40 +1,118 @@
 <?php
 namespace telegram;
 
-require('http/Connection.php');
+use bitly\RestApi;
+use exceptions\FormatException;
+use exceptions\ShortLinkNotFoundedException;
 
+require('telegram/Connection.php');
+require('Log/FLogger.php');
+require('TIniFileEx.php');
+require('bitly/RestApi.php');
+require_once("exceptions/FormatException.php");
+
+/**
+ * Class Bot
+ *
+ * Предоставляет методы доступа к чат-боту
+ *
+ * @package telegram Содержит все классы для работы с Telegram API
+ */
 class Bot
 {
 
+    /**
+     * @var Connection
+     */
     private $connection;
+    /**
+     * @var \FLogger Логгер
+     */
     private $log;
     /**
-     * Bot constructor.
+     * @var \TIniFileEx
      */
-    public function __construct($log)
+    private $config;
+    /**
+     * @var \TIniFileEx
+     */
+    private $configTelegram;
+    /**
+     * @var string
+     */
+    private $lastupdate;
+    /**
+     * @var \TIniFileEx
+     */
+    private $users;
+    /**
+     * @var RestApi
+     */
+    private $bitlyApi;
+
+    /**
+     * Bot constructor.
+     *
+     * Выполняет основные инициализации
+     *
+     */
+    public function __construct()
     {
-        $this->log = $log;
-        $telegramConfig = parse_ini_file("telegram/config.ini", false);
+        $this->bitlyApi = new RestApi();
+        $this->users = new \TIniFileEx("Log/users.ini");
+        $this->config = new \TIniFileEx("config.ini");
+        $this->configTelegram = new \TIniFileEx("telegram/config.ini");
 
-        $url = $telegramConfig['URL'];
-        $token = $telegramConfig['token'];
+        $this->log = new \FLogger($this->config->read('main', "logFile"));
+        $this->lastupdate = $this->config->read('main', "lastUpdateID");
 
-        $this->connection = new \Connection($token, $url);
+        $this->connection = new Connection(
+            $this->configTelegram->read('telegram', 'token'),
+            $this->configTelegram->read('telegram', 'URL')
+        );
     }
 
-    public function getUpdates()
+    /**
+     *
+     * Возвращает все последние обновления
+     *
+     * @param $offset Отступ
+     * @return array Массив ответа
+     */
+    public function getUpdates($offset)
     {
-        return $this->connection->request("getUpdates",null);
+        $params = null;
+        if (!empty($offset)) {
+            $params["offset"] = $offset;
+        }
+        return $this->connection->request("getUpdates", $params);
     }
 
+    /**
+     *
+     * Отправляет сообщение пользователю
+     *
+     * @param string $text Тест сообщения
+     * @param string $chatID Идентификатор чата
+     */
     public function sendMessage($text, $chatID)
     {
         $params["text"] = $text;
         $params["chat_id"] = $chatID;
+        $params["disable_web_page_preview"] = true;
 
         $this->connection->request("sendmessage", $params);
     }
 
+    /**
+     *
+     * Выводит кнопки пользователю
+     *
+     * @param string $text Текст сообщения ообщение
+     * @param string $chatID Идентификатор чата
+     * @param array $keyboards Массив кнопок
+     * @param array $settings Массив настроек
+     */
     public function keyboard($text, $chatID, $keyboards, $settings)
     {
         $replyMarkup = $settings;
@@ -47,6 +125,14 @@ class Bot
         $this->connection->request("sendmessage", $params);
     }
 
+    /**
+     *
+     * Выводит кнопки в сообщении
+     *
+     * @param string $text Текст кнопки
+     * @param string $chatID Идентификатор чата
+     * @param string $inlineKeyboards Массив кнопок
+     */
     public function inlineKeyboard($text, $chatID, $inlineKeyboards)
     {
         $this->log->log(json_encode($inlineKeyboards));
@@ -56,4 +142,151 @@ class Bot
 
         $this->connection->request("sendmessage", $params);
     }
+
+    /**
+     *
+     * Возвращает ссылку с добавленным протоколом http
+     *
+     * @param string $url Ссылка
+     * @return string Ссылка с добавленным протоколом
+     */
+    public function addHttp ($url)
+    {
+        if (!preg_match('/^https?:\/\//', $url)) {
+            return "http://" . $url;
+        }
+        return $url;
+    }
+
+    /**
+     *
+     * Обрабатывет отправленную ссылку
+     *
+     * @param string $message Текст сообщения
+     * @param string $chat_id Идентификатор чата
+     */
+    public function sendLink ($message, $chat_id)
+    {
+        $url = $this->addHttp($message);
+        try {
+            if (
+                preg_match('/^(https?:\/\/)?bit\.ly(\/[\w\.]*)*\/?$/', $url) ||
+                preg_match('/^(https?:\/\/)?j\.mp(\/[\w\.]*)*\/?$/', $url)
+            ) {
+                $this->sendMessage($this->bitlyApi->expand($url), $chat_id);
+            } else if (preg_match('/^(https?:\/\/)?([\w\.]+)\.([a-z]{2,6}\.?)(\/[\w&?=\-\.]*)*\/?$/', $message)) {
+                $this->sendMessage($this->bitlyApi->createBitlink($url), $chat_id);
+            } else {
+                throw new FormatException('Неверный формат ссылки');
+            }
+        } catch (ShortLinkNotFoundedException $e) {
+            $this->sendMessage($e->getMessage(), $chat_id);
+        } catch (FormatException $e) {
+            $this->sendMessage($e->getMessage(), $chat_id);
+        }
+    }
+
+    /**
+     * Запускает чат-бота
+     */
+    public function run()
+    {
+        while (true) {
+            $this->log->log("запрос на обновление");
+            $updates = ((array)$this->getUpdates($this->lastupdate))["result"];
+            $this->log->log("запрос прошел");
+
+            echo "<pre>";
+            var_dump($updates);
+            echo "</pre>";
+
+            $chat_id = null;
+            $chat = null;
+            $message = null;
+            $update_id = null;
+
+            foreach ($updates as $update) {
+                $update_id = ((array)$update)["update_id"];
+                $chat = ((array)((array)$update)["message"])["chat"];
+                $chat_id = ((array)$chat)["id"];
+                $this->log->log("id чата: " . $chat_id);
+                $message = ((array)((array)$update)["message"])["text"];
+                $user = ((array)((array)((array)$update)["message"])["from"]);
+
+                switch ($message) {
+                    case "/start":
+                        if ($user["id"] != null &&
+                            $user["id"] != null &&
+                            $this->users->read($user["id"],"chat_id", null) != $chat_id)
+                        {
+
+                            $this->users->write($user["id"], "first_name", $user["first_name"]);
+                            $this->users->write($user["id"], "last_name", $user["last_name"]);
+                            $this->users->write($user["id"], "username", $user["username"]);
+                            $this->users->write($user["id"], "language", $user["language_code"]);
+                            $this->users->write($user["id"], "chat_id", $chat_id);
+
+                            $this->users->updateFile();
+                        }
+
+                        $this->log->log("создание клавиатуры");
+                        $keyboards = [["История"], ["Помощь"]];
+                        $keyboardSettings = array(
+                            "resize_keyboard" => true,
+                        );
+                        $this->keyboard(" f", $chat_id, $keyboards, $keyboardSettings);
+                        $this->log->log("клавиатура создана");
+                        break;
+
+                    case "История":
+                        $this->log->log("создание ярлыка");
+
+                        $history = $this->bitlyApi->getExistLinks();
+                        $content = "История созданных ссылок: \n\n";
+                        foreach ($history as $i) {
+                            $content .= $i['title'] . "\n";
+                            $content .= "🔗 " . $i['long_url'] ."\n\n". "➡ ". $i['link'] . "\n---------\n";
+                        }
+
+                        $inlineKeyboards = [
+                            "inline_keyboard" => [
+                                [
+                                    (object)[
+                                        "text" => "<",
+                                        "callback_data" => "google.com"
+                                    ],
+                                    (object)[
+                                        "text" => ">",
+                                        "callback_data" => "google.com"
+                                    ]
+                                ]
+                            ]
+                        ];
+
+                        $this->inlineKeyboard($content, $chat_id, $inlineKeyboards);
+                        $this->log->log("ярлык создан");
+                        break;
+
+                    case "/help":
+                    case "Помощь":
+                        $this->log->log("отправляем сообщение");
+                        $this->sendMessage("помощь", $chat_id);
+                        $this->log->log("сообщение отправлено");
+                        break;
+                    default:
+                        $this->log->log("отправляем сообщение");
+                        $this->sendLink($message, $chat_id);
+                        $this->log->log("сообщение отправлено");
+                }
+            }
+
+            $this->lastupdate = $update_id+1;
+            if ($this->lastupdate > 1) {
+                $this->config->write('main', "lastUpdateID", $this->lastupdate);
+                $this->config->updateFile();
+            }
+            sleep(1);
+        }
+    }
 }
+

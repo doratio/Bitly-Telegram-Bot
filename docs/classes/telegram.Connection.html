@@ -146,19 +146,19 @@
                                 <div class="accordion" style="margin-bottom: 0">
         <div class="accordion-group">
             <div class="accordion-heading">
-                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-940086748"></a>
+                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-221644101"></a>
                                 <a href="../namespaces/default.html" style="margin-left: 30px; padding-left: 0">\</a>
             </div>
-            <div id="namespace-940086748" class="accordion-body collapse in">
+            <div id="namespace-221644101" class="accordion-body collapse in">
                 <div class="accordion-inner">
 
                                                     <div class="accordion" style="margin-bottom: 0">
         <div class="accordion-group">
             <div class="accordion-heading">
-                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1583975562"></a>
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1715606508"></a>
                                 <a href="../namespaces/bitly.html" style="margin-left: 30px; padding-left: 0">bitly</a>
             </div>
-            <div id="namespace-1583975562" class="accordion-body collapse ">
+            <div id="namespace-1715606508" class="accordion-body collapse ">
                 <div class="accordion-inner">
 
                     
@@ -173,10 +173,10 @@
                                                     <div class="accordion" style="margin-bottom: 0">
         <div class="accordion-group">
             <div class="accordion-heading">
-                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-309985121"></a>
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-584197628"></a>
                                 <a href="../namespaces/exceptions.html" style="margin-left: 30px; padding-left: 0">exceptions</a>
             </div>
-            <div id="namespace-309985121" class="accordion-body collapse ">
+            <div id="namespace-584197628" class="accordion-body collapse ">
                 <div class="accordion-inner">
 
                     
@@ -192,10 +192,10 @@
                                                     <div class="accordion" style="margin-bottom: 0">
         <div class="accordion-group">
             <div class="accordion-heading">
-                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-935782250"></a>
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-843214620"></a>
                                 <a href="../namespaces/telegram.html" style="margin-left: 30px; padding-left: 0">telegram</a>
             </div>
-            <div id="namespace-935782250" class="accordion-body collapse ">
+            <div id="namespace-843214620" class="accordion-body collapse ">
                 <div class="accordion-inner">
 
                     
@@ -226,13 +226,14 @@
             <div class="row-fluid">
                 <div class="span8 content class">
                     <nav>
-                                                <a href="../namespaces/default.html">\</a> <i class="icon-level-up"></i>
+                                                <a href="../namespaces/telegram.html">\telegram</a> <i class="icon-level-up"></i>
                                             </nav>
                     <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal"><i class="icon-code"></i></a>
 
-                    <h1><small>\</small>Logger</h1>
-                    <p><em>Class Logger</em></p>
-                    <p>Абстрактный класс логгера</p>
+                    <h1><small>\telegram</small>Connection</h1>
+                    <p><em>Class Connection</em></p>
+                    <p>Предоставляет общие методы для доступа
+к Telegram API</p>
                     
                                         
                     <section id="summary">
@@ -250,7 +251,8 @@
                         </section>
                         <section class="row-fluid public">
                             <section class="span4">
-                                                                    <a href="../classes/Logger.html#method_log" class="">log()</a><br />
+                                                                    <a href="../classes/telegram.Connection.html#method___construct" class="">__construct()</a><br />
+                                                                    <a href="../classes/telegram.Connection.html#method_request" class="">request()</a><br />
                                                             </section>
                             <section class="span4">
                                                                     <em>No public properties found</em>
@@ -275,7 +277,7 @@
                                                                     <em>No private methods found</em>
                                                             </section>
                             <section class="span4">
-                                                                    <em>No private properties found</em>
+                                                                    <a href="../classes/telegram.Connection.html#property_url" class="">$url</a><br />
                                                             </section>
                             <section class="span4">
                                 <em>N/A</em>
@@ -284,17 +286,16 @@
                     </section>
                 </div>
                 <aside class="span4 detailsbar">
-                                            <span class="label label-info">abstract</span>
                                         
                     
                     <dl>
                         <dt>File</dt>
-                            <dd><a href="../files/Log.Logger.html"><div class="path-wrapper">Log/Logger.php</div></a></dd>
+                            <dd><a href="../files/telegram.Connection.html"><div class="path-wrapper">telegram/Connection.php</div></a></dd>
                                                 <dt>Package</dt>
-                            <dd><div class="namespace-wrapper">Default</div></dd>
+                            <dd><div class="namespace-wrapper">telegram</div></dd>
                                                 <dt>Class hierarchy</dt>
                             <dd class="hierarchy">
-                                                                                                                                                                    <div class="namespace-wrapper">\Logger</div>
+                                                                                                                                                                    <div class="namespace-wrapper">\telegram\Connection</div>
                             </dd>
 
                         
@@ -310,7 +311,39 @@
             </div>
 
                         
-                        
+                                    <a id="properties" name="properties"></a>
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <h2>Properties</h2>
+                </div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_url" name="property_url" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$url</h3>
+                <pre class="signature">$url : string</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                string
+                &mdash; Ссылка на Telegram API                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                            
                                     <a id="methods" name="methods"></a>
             <div class="row-fluid">
                 <div class="span8 content class"><h2>Methods</h2></div>
@@ -319,20 +352,25 @@
 
                                     <div class="row-fluid">
         <div class="span8 content class">
-            <a id="method_log" name="method_log" class="anchor"></a>
+            <a id="method___construct" name="method___construct" class="anchor"></a>
             <article class="method">
-                <h3 class="public ">log()</h3>
+                <h3 class="public ">__construct()</h3>
                 <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
-                <pre class="signature" style="margin-right: 54px;">log(string  <span class="argument">$textLog</span>) : void</pre>
-                <p><em>Абстрактная функция логгирования</em></p>
+                <pre class="signature" style="margin-right: 54px;">__construct(  <span class="argument">$token</span>,   <span class="argument">$url</span>) </pre>
+                <p><em>Bot constructor.</em></p>
                 
 
                                     <h4>Parameters</h4>
                     <table class="table table-condensed table-hover">
                                                     <tr>
-                                <td>string</td>
-                                <td>$textLog </td>
-                                <td><p>Сообщение</p></td>
+                                <td></td>
+                                <td>$token </td>
+                                <td><p>Telegram Access Token</p></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$url </td>
+                                <td><p>Ссылка на Telegram API</p></td>
                             </tr>
                                             </table>
                 
@@ -342,8 +380,49 @@
         </div>
         <aside class="span4 detailsbar">
             <h1><i class="icon-arrow-down"></i></h1>
-                                        <span class="label label-info">abstract</span>
-                                                <dl>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_request" name="method_request" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">request()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">request(  <span class="argument">$method</span>, array  <span class="argument">$params = array()</span>) : array</pre>
+                <p><em>Отправляет запрос к методу с параметрами</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$method </td>
+                                <td><p>Метод Telegram API</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>array</td>
+                                <td>$params </td>
+                                <td><p>Отправляемые параметры</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    array
+                                            &mdash; <p>Массив ответа</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
                                                                             </dl>
             <h2>Tags</h2>
             <table class="table table-condensed">
@@ -358,10 +437,10 @@
     <div id="source-view" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="source-view-label" aria-hidden="true">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-            <h3 id="source-view-label">Logger.php</h3>
+            <h3 id="source-view-label">Connection.php</h3>
         </div>
         <div class="modal-body">
-            <pre data-src="../files/Log/Logger.php.txt" class="language-php line-numbers"></pre>
+            <pre data-src="../files/telegram/Connection.php.txt" class="language-php line-numbers"></pre>
         </div>
     </div>
 

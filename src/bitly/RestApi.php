@@ -4,8 +4,8 @@ namespace bitly;
 
 use exceptions\ShortLinkNotFoundedException;
 
-require("bitly/BitlyConnection.php");
-require_once("exceptions/ShortLinkNotFoundedException.php");
+require_once(__DIR__."/BitlyConnection.php");
+require_once(__DIR__."/../exceptions/ShortLinkNotFoundedException.php");
 
 /**
  * Class RestApi
@@ -37,11 +37,14 @@ class RestApi
      */
     public function __construct()
     {
-        $config = \parse_ini_file("bitly/config.ini");
+        $config = \parse_ini_file(__DIR__."/config.ini");
         $this->connection = new \BitlyConnection($config['token']);
     }
 
     /**
+     *
+     * Возвращает список ссылок и их сокращений
+     *
      * @param int $offset Количество пропускаемых с начала данных
      * @return array Массив ссылок
      */
@@ -75,6 +78,21 @@ class RestApi
 
     /**
      *
+     * Возвращает ссылку с добавленным протоколом http
+     *
+     * @param string $url Ссылка
+     * @return string Ссылка с добавленным протоколом
+     */
+    public function addHttp ($url)
+    {
+        if (!preg_match('/^https?:\/\//', $url)) {
+            return "http://" . $url;
+        }
+        return $url;
+    }
+
+    /**
+     *
      * Создает сокращенную ссылку и возвращает ее.
      * Если сокращенная ссылка уже создана, просто возращает ее.
      *
@@ -84,9 +102,8 @@ class RestApi
     public function createBitlink($url)
     {
         $res = $this->connection->request("v3/user/link_save", [
-            'longUrl' => $url
+            'longUrl' => $this->addHttp($url)
         ]);
-        print_r($res);
         return $res['data']['link_save']['link'];
     }
 
