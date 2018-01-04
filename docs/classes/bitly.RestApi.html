@@ -116,12 +116,12 @@
                         <ul class="dropdown-menu">
                             <li>
                                 <a href="../reports/errors.html">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <i class="icon-list-alt"></i>&#160;Errors <span class="label label-info pull-right">43</span>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <i class="icon-list-alt"></i>&#160;Errors <span class="label label-info pull-right">22</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="../reports/markers.html">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <i class="icon-list-alt"></i>&#160;Markers <span class="label label-info pull-right">0</span>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <i class="icon-list-alt"></i>&#160;Markers <span class="label label-info pull-right">0</span>
                                 </a>
                             </li>
                             <li>
@@ -146,19 +146,19 @@
                                 <div class="accordion" style="margin-bottom: 0">
         <div class="accordion-group">
             <div class="accordion-heading">
-                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-852790365"></a>
+                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-1293829245"></a>
                                 <a href="../namespaces/default.html" style="margin-left: 30px; padding-left: 0">\</a>
             </div>
-            <div id="namespace-852790365" class="accordion-body collapse in">
+            <div id="namespace-1293829245" class="accordion-body collapse in">
                 <div class="accordion-inner">
 
                                                     <div class="accordion" style="margin-bottom: 0">
         <div class="accordion-group">
             <div class="accordion-heading">
-                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-53410557"></a>
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-2089439982"></a>
                                 <a href="../namespaces/bitly.html" style="margin-left: 30px; padding-left: 0">bitly</a>
             </div>
-            <div id="namespace-53410557" class="accordion-body collapse ">
+            <div id="namespace-2089439982" class="accordion-body collapse ">
                 <div class="accordion-inner">
 
                     
@@ -173,15 +173,16 @@
                                                     <div class="accordion" style="margin-bottom: 0">
         <div class="accordion-group">
             <div class="accordion-heading">
-                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1005882599"></a>
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1897571575"></a>
                                 <a href="../namespaces/exceptions.html" style="margin-left: 30px; padding-left: 0">exceptions</a>
             </div>
-            <div id="namespace-1005882599" class="accordion-body collapse ">
+            <div id="namespace-1897571575" class="accordion-body collapse ">
                 <div class="accordion-inner">
 
                     
                     <ul>
-                                                                                                    <li class="class"><a href="../classes/exceptions.ShortLinkNotFounded.html">ShortLinkNotFounded</a></li>
+                                                                                                    <li class="class"><a href="../classes/exceptions.FormatException.html">FormatException</a></li>
+                                                    <li class="class"><a href="../classes/exceptions.ShortLinkNotFoundedException.html">ShortLinkNotFoundedException</a></li>
                                             </ul>
                 </div>
             </div>
@@ -191,15 +192,15 @@
                                                     <div class="accordion" style="margin-bottom: 0">
         <div class="accordion-group">
             <div class="accordion-heading">
-                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-680922882"></a>
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-2029021962"></a>
                                 <a href="../namespaces/telegram.html" style="margin-left: 30px; padding-left: 0">telegram</a>
             </div>
-            <div id="namespace-680922882" class="accordion-body collapse ">
+            <div id="namespace-2029021962" class="accordion-body collapse ">
                 <div class="accordion-inner">
 
                     
                     <ul>
-                                                                                                    <li class="class"><a href="../classes/telegram.Bot.html">Bot</a></li>
+                                                                                                    <li class="class"><a href="../classes/telegram.Connection.html">Connection</a></li>
                                             </ul>
                 </div>
             </div>
@@ -209,9 +210,9 @@
                     
                     <ul>
                                                                                                     <li class="class"><a href="../classes/BitlyConnection.html">BitlyConnection</a></li>
-                                                    <li class="class"><a href="../classes/Connection.html">Connection</a></li>
                                                     <li class="class"><a href="../classes/FLogger.html">FLogger</a></li>
                                                     <li class="class"><a href="../classes/Logger.html">Logger</a></li>
+                                                    <li class="class"><a href="../classes/TIniFileEx.html">TIniFileEx</a></li>
                                             </ul>
                 </div>
             </div>
@@ -385,7 +386,7 @@
                 <h3 class="public ">getExistLinks()</h3>
                 <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
                 <pre class="signature" style="margin-right: 54px;">getExistLinks(integer  <span class="argument">$offset</span>) : array</pre>
-                <p><em></em></p>
+                <p><em>Возвращает список ссылок и их сокращений</em></p>
                 
 
                                     <h4>Parameters</h4>
@@ -435,6 +436,11 @@
                             </tr>
                                             </table>
                 
+                                    <h4>Throws</h4>
+                    <dl>
+                                                    <dt>\exceptions\ShortLinkNotFoundedException</dt>
+                            <dd></dd>
+                                                                    </dl>
                 
                                     <h4>Returns</h4>
                     string
@@ -542,7 +548,7 @@
                 <section class="span10 offset1">
                     <hr />
                     Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and authored
-                    on January 4th, 2018 at 17:04.
+                    on January 4th, 2018 at 19:49.
                 </section>
             </section>
         </section>

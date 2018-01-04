@@ -12,20 +12,51 @@ require('TIniFileEx.php');
 require('bitly/RestApi.php');
 require_once("exceptions/FormatException.php");
 
+/**
+ * Class Bot
+ *
+ * Предоставляет методы доступа к чат-боту
+ *
+ * @package telegram Содержит все классы для работы с Telegram API
+ */
 class Bot
 {
 
+    /**
+     * @var Connection
+     */
     private $connection;
+    /**
+     * @var \FLogger Логгер
+     */
     private $log;
+    /**
+     * @var \TIniFileEx
+     */
     private $config;
+    /**
+     * @var \TIniFileEx
+     */
     private $configTelegram;
+    /**
+     * @var string
+     */
     private $lastupdate;
+    /**
+     * @var \TIniFileEx
+     */
     private $users;
+    /**
+     * @var RestApi
+     */
     private $bitlyApi;
     private $historyindex;
 
     /**
      * Bot constructor.
+     *
+     * Выполняет основные инициализации
+     *
      */
     public function __construct()
     {
@@ -43,6 +74,13 @@ class Bot
         );
     }
 
+    /**
+     *
+     * Возвращает все последние обновления
+     *
+     * @param $offset Отступ
+     * @return array Массив ответа
+     */
     public function getUpdates($offset)
     {
         $params = null;
@@ -52,6 +90,13 @@ class Bot
         return $this->connection->request("getUpdates", $params);
     }
 
+    /**
+     *
+     * Отправляет сообщение пользователю
+     *
+     * @param string $text Тест сообщения
+     * @param string $chatID Идентификатор чата
+     */
     public function sendMessage($text, $chatID)
     {
         $params["text"] = $text;
@@ -61,6 +106,15 @@ class Bot
         $this->connection->request("sendmessage", $params);
     }
 
+    /**
+     *
+     * Выводит кнопки пользователю
+     *
+     * @param string $text Текст сообщения ообщение
+     * @param string $chatID Идентификатор чата
+     * @param array $keyboards Массив кнопок
+     * @param array $settings Массив настроек
+     */
     public function keyboard($text, $chatID, $keyboards, $settings)
     {
         $replyMarkup = $settings;
@@ -73,6 +127,14 @@ class Bot
         $this->connection->request("sendmessage", $params);
     }
 
+    /**
+     *
+     * Выводит кнопки в сообщении
+     *
+     * @param string $text Текст кнопки
+     * @param string $chatID Идентификатор чата
+     * @param string $inlineKeyboards Массив кнопок
+     */
     public function inlineKeyboard($text, $chatID, $inlineKeyboards)
     {
         $this->log->log(json_encode($inlineKeyboards));
@@ -84,16 +146,24 @@ class Bot
         $this->connection->request("sendmessage", $params);
     }
 
-    public function sendLink($message, $chat_id)
+
+    /**
+     *
+     * Обрабатывет отправленную ссылку
+     *
+     * @param string $message Текст сообщения
+     * @param string $chat_id Идентификатор чата
+     */
+    public function sendLink ($message, $chat_id)
     {
         try {
-            if (preg_match('/^(https?:\/\/)?([\w\.]+)\.([a-z]{2,6}\.?)(\/[\w\.]*)*\/?$/', $message)) {
-                $this->sendMessage($this->bitlyApi->createBitlink($message), $chat_id);
-            } else if (
+            if (
                 preg_match('/^(https?:\/\/)?bit\.ly(\/[\w\.]*)*\/?$/', $message) ||
-                preg_match('/https?:\/\/j\.mp(\/[\w\.]*)*\/?$/', $message)
+                preg_match('/^(https?:\/\/)?j\.mp(\/[\w\.]*)*\/?$/', $message)
             ) {
                 $this->sendMessage($this->bitlyApi->expand($message), $chat_id);
+            } else if (preg_match('/^(https?:\/\/)?([\w\.]+)\.([a-z]{2,6}\.?)(\/[\w&?=\-\.]*)*\/?$/', $message)) {
+                $this->sendMessage($this->bitlyApi->createBitlink($message), $chat_id);
             } else {
                 throw new FormatException('Неверный формат ссылки');
             }
@@ -115,6 +185,9 @@ class Bot
         $this->connection->request("editMessageText", $params);
     }
 
+    /**
+     * Запускает чат-бота
+     */
     public function run()
     {
         while (true) {
@@ -208,7 +281,8 @@ class Bot
                     case "/help":
                     case "Помощь":
                         $this->log->log("отправляем сообщение");
-                        $this->sendMessage("1) Как сократить URL?\nДля сокращения URL, отправьте ссылку сообщением боту.\nВ ответ он пришлет Вам сокращенную ссылку.\n2) Как расшифровать сокращенную ссылку?\nДля расшифровки сокращенной ссылки (например, bit.ly/2CF5z2o), отправьте ее сообщением боту.\nВ ответ он пришлет Вам исходную ссылку.\n3) Как посмотреть историю созданных сокращенных ссылок?\nНажмите на кнопку \"История\", снизу от поля ввода чата.\nВам придет список последних ссылок. Для навигации используйте кнопки навигации. ", $chat_id);
+                        $tutorial = "Помощь\n\n1) Как сократить URL?\nДля сокращения URL, отправьте ссылку сообщением боту.\nВ ответ он пришлет Вам сокращенную ссылку.\n2) Как расшифровать сокращенную ссылку?\nДля расшифровки сокращенной ссылки (например, bit.ly/2CF5z2o), отправьте ее сообщением боту.\nВ ответ он пришлет Вам исходную ссылку.\n3) Как посмотреть историю созданных сокращенных ссылок?\nНажмите на кнопку \"История\", снизу от поля ввода чата.\nВам придет список последних ссылок. Для навигации используйте кнопки навигации.\n\nДля вызова этой инструкции нажмите на кнопку \"Помощь\" снизу от поля ввода.";
+                        $this->sendMessage($tutorial, $chat_id);
                         $this->log->log("сообщение отправлено");
                         break;
 
