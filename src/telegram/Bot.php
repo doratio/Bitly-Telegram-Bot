@@ -50,7 +50,32 @@ class Bot
      * @var RestApi
      */
     private $bitlyApi;
+    /**
+     * @var
+     */
     private $historyindex;
+    /**
+     * @var array кнопки
+     */
+    private $inlineKeyboards = [
+        "inline_keyboard" => [
+            [
+                (object)[
+                    "text" => "<",
+                    "callback_data" => "prev"
+                ],
+                (object)[
+                    "text" => ">",
+                    "callback_data" => "next"
+                ]
+            ]
+        ]
+    ];
+    /**
+     * @var string
+     */
+    private $tutorial = "Помощь\n\n1) Как сократить URL?\nДля сокращения URL, отправьте ссылку сообщением боту.\nВ ответ он пришлет Вам сокращенную ссылку.\n2) Как расшифровать сокращенную ссылку?\nДля расшифровки сокращенной ссылки (например, bit.ly/2CF5z2o), отправьте ее сообщением боту.\nВ ответ он пришлет Вам исходную ссылку.\n3) Как посмотреть историю созданных сокращенных ссылок?\nНажмите на кнопку \"История\", снизу от поля ввода чата.\nВам придет список последних ссылок. Для навигации используйте кнопки навигации.\n\nДля вызова этой инструкции нажмите на кнопку \"Помощь\" снизу от поля ввода.";
+
 
     /**
      * Bot constructor.
@@ -146,6 +171,26 @@ class Bot
         $this->connection->request("sendmessage", $params);
     }
 
+    /**
+     *
+     * Редактирование сообщения
+     *
+     * @param string $message новый текст
+     * @param string $chat_id Идентификатор чата
+     * @param string $message_id Идентификатор сообщения
+     * @param string $inlineKeyboards Массив кнопок
+     */
+    public function editMessageText($message, $chat_id, $message_id, $inlineKeyboards)
+    {
+        $params["chat_id"] = $chat_id;
+        $params["message_id"] = $message_id;
+        $params["text"] = $message;
+        $params["disable_web_page_preview"] = true;
+        $params["reply_markup"] = json_encode($inlineKeyboards);
+
+        $this->connection->request("editMessageText", $params);
+    }
+
 
     /**
      *
@@ -154,7 +199,7 @@ class Bot
      * @param string $message Текст сообщения
      * @param string $chat_id Идентификатор чата
      */
-    public function sendLink ($message, $chat_id)
+    public function sendLink($message, $chat_id)
     {
         try {
             if (
@@ -174,17 +219,6 @@ class Bot
         }
     }
 
-    public function editMessageText($message, $chat_id, $message_id, $inlineKeyboards)
-    {
-        $params["chat_id"] = $chat_id;
-        $params["message_id"] = $message_id;
-        $params["text"] = $message;
-        $params["disable_web_page_preview"] = true;
-        $params["reply_markup"] = json_encode($inlineKeyboards);
-
-        $this->connection->request("editMessageText", $params);
-    }
-
     /**
      *
      * Возвращает отформатированную строку списка истории
@@ -192,7 +226,7 @@ class Bot
      * @param $history Массив ссылок
      * @return string Отформатированная строка со списком ссылок
      */
-    private function renderHistory ($history)
+    private function renderHistory($history)
     {
         $content = "История созданных ссылок: \n\n";
         foreach ($history as $i) {
@@ -245,25 +279,14 @@ class Bot
 
                 switch ($message) {
                     case "/start":
-                        if ($user["id"] != null &&
-                            $user["id"] != null &&
-                            $this->users->read($user["id"], "chat_id", null) != $chat_id) {
-
-                            $this->users->write($user["id"], "first_name", $user["first_name"]);
-                            $this->users->write($user["id"], "last_name", $user["last_name"]);
-                            $this->users->write($user["id"], "username", $user["username"]);
-                            $this->users->write($user["id"], "language", $user["language_code"]);
-                            $this->users->write($user["id"], "chat_id", $chat_id);
-
-                            $this->users->updateFile();
-                        }
+                        $this->infoAboutU($user, $chat_id);
 
                         $this->log->log("создание клавиатуры");
                         $keyboards = [["История"], ["Помощь"]];
                         $keyboardSettings = array(
                             "resize_keyboard" => true,
                         );
-                        $this->keyboard("1) Как сократить URL?\nДля сокращения URL, отправьте ссылку сообщением боту.\nВ ответ он пришлет Вам сокращенную ссылку.\n2) Как расшифровать сокращенную ссылку?\nДля расшифровки сокращенной ссылки (например, bit.ly/2CF5z2o), отправьте ее сообщением боту.\nВ ответ он пришлет Вам исходную ссылку.\n3) Как посмотреть историю созданных сокращенных ссылок?\nНажмите на кнопку \"История\", снизу от поля ввода чата.\nВам придет список последних ссылок. Для навигации используйте кнопки навигации. ", $chat_id, $keyboards, $keyboardSettings);
+                        $this->keyboard($this->tutorial, $chat_id, $keyboards, $keyboardSettings);
                         $this->log->log("клавиатура создана");
                         break;
 
@@ -274,104 +297,58 @@ class Bot
 
                         $content = $this->renderHistory($history);
 
-                        $inlineKeyboards = [
-                            "inline_keyboard" => [
-                                [
-                                    (object)[
-                                        "text" => "<",
-                                        "callback_data" => "prev"
-                                    ],
-                                    (object)[
-                                        "text" => ">",
-                                        "callback_data" => "next"
-                                    ]
-                                ]
-                            ]
-                        ];
-
-                        $this->inlineKeyboard($content, $chat_id, $inlineKeyboards);
+                        $this->inlineKeyboard($content, $chat_id, $this->inlineKeyboards);
                         $this->log->log("ярлык создан");
                         break;
 
                     case "/help":
                     case "Помощь":
                         $this->log->log("отправляем сообщение");
-                        $tutorial = "Помощь\n\n1) Как сократить URL?\nДля сокращения URL, отправьте ссылку сообщением боту.\nВ ответ он пришлет Вам сокращенную ссылку.\n2) Как расшифровать сокращенную ссылку?\nДля расшифровки сокращенной ссылки (например, bit.ly/2CF5z2o), отправьте ее сообщением боту.\nВ ответ он пришлет Вам исходную ссылку.\n3) Как посмотреть историю созданных сокращенных ссылок?\nНажмите на кнопку \"История\", снизу от поля ввода чата.\nВам придет список последних ссылок. Для навигации используйте кнопки навигации.\n\nДля вызова этой инструкции нажмите на кнопку \"Помощь\" снизу от поля ввода.";
-                        $this->sendMessage($tutorial, $chat_id);
+                        $this->sendMessage($this->tutorial, $chat_id);
                         $this->log->log("сообщение отправлено");
                         break;
 
                     case "prev":
                         if ($have_callback_query) {
 
-                            if($this->historyindex["$message_id"]["offset"] !== 0) {
+                            if ($this->historyindex["$message_id"]["offset"] !== 0) {
                                 $this->historyindex["$message_id"]["offset"] -= 3;
                             }
-
-                            echo "<div style='color: red'>".$this->historyindex["$message_id"]["offset"]."</div>";
 
                             $history = $this->bitlyApi->getExistLinks(
                                 $this->historyindex["$message_id"]["offset"]
                             );
-                            
+
                             $content = $this->renderHistory($history);
 
-                            $inlineKeyboards = [
-                                "inline_keyboard" => [
-                                    [
-                                        (object)[
-                                            "text" => "<",
-                                            "callback_data" => "prev"
-                                        ],
-                                        (object)[
-                                            "text" => ">",
-                                            "callback_data" => "next"
-                                        ]
-                                    ]
-                                ]
-                            ];
-
-                            $this->editMessageText($content, $chat_id, $message_id, $inlineKeyboards);
+                            $this->editMessageText($content, $chat_id, $message_id, $this->inlineKeyboards);
                         } else {
                             $this->sendMessage('Неверный формат ссылки', $chat_id);
                         }
                         break;
+
                     case "next":
                         if ($have_callback_query) {
 
-                                $this->historyindex["$message_id"]["offset"] += 3;
-                                echo "<div style='color: red'>".$this->historyindex["$message_id"]["offset"]."</div>";
+                            $this->historyindex["$message_id"]["offset"] += 3;
+
                             try {
                                 $history = $this->bitlyApi->getExistLinks(
                                     $this->historyindex["$message_id"]["offset"]
                                 );
                             } catch (\Exception $ex) {
                                 $this->historyindex["$message_id"]["offset"] -= 3;
-                                break ;
+                                break;
                             }
 
                             $content = $this->renderHistory($history);
 
-                            $inlineKeyboards = [
-                                "inline_keyboard" => [
-                                    [
-                                        (object)[
-                                            "text" => "<",
-                                            "callback_data" => "prev"
-                                        ],
-                                        (object)[
-                                            "text" => ">",
-                                            "callback_data" => "next"
-                                        ]
-                                    ]
-                                ]
-                            ];
-
-                            $this->editMessageText($content, $chat_id, $message_id, $inlineKeyboards);
+                            $this->editMessageText($content, $chat_id, $message_id, $this->inlineKeyboards);
                         } else {
                             $this->sendMessage('Неверный формат ссылки', $chat_id);
                         }
                         break;
+
                     default:
                         $this->log->log("отправляем сообщение");
                         $this->sendLink($message, $chat_id);
@@ -385,6 +362,29 @@ class Bot
                 $this->config->updateFile();
             }
             sleep(1);
+        }
+    }
+
+    /**
+     *
+     * Получает информацию о пользователях
+     *
+     * @param $user информация о пользователе
+     * @return $chat_id Идентификатор чата
+     */
+    public function infoAboutU($user, $chat_id)
+    {
+        if ($user["id"] != null &&
+            $user["id"] != null &&
+            $this->users->read($user["id"], "chat_id", null) != $chat_id) {
+
+            $this->users->write($user["id"], "first_name", $user["first_name"]);
+            $this->users->write($user["id"], "last_name", $user["last_name"]);
+            $this->users->write($user["id"], "username", $user["username"]);
+            $this->users->write($user["id"], "language", $user["language_code"]);
+            $this->users->write($user["id"], "chat_id", $chat_id);
+
+            $this->users->updateFile();
         }
     }
 }

@@ -29,7 +29,7 @@ class BitlyApi extends TestCase
         $this->assertEquals('http://bit.ly/2CGmOjA', $short);
     }
 
-    public function testAddHttp ()
+    public function testAddHttp()
     {
         $httpAdded = $this->restApi->addHttp("vk.com");
 

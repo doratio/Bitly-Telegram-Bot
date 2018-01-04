@@ -3,12 +3,13 @@ if (!defined('_BR_'))
     /**
      *
      */
-    define('_BR_',chr(13).chr(10));
+    define('_BR_', chr(13) . chr(10));
 
 /**
  * Class TIniFileEx
  */
-class TIniFileEx {
+class TIniFileEx
+{
     /**
      * @var string Название файла
      */
@@ -22,7 +23,8 @@ class TIniFileEx {
      * TIniFileEx constructor.
      * @param bool $file
      */
-    function __construct($file = false){
+    function __construct($file = false)
+    {
         if ($file)
             $this->loadFromFile($file);
     }
@@ -30,7 +32,8 @@ class TIniFileEx {
     /**
      *  Парсит файл c расширением ini
      */
-    function initArray(){
+    function initArray()
+    {
         $this->arr = parse_ini_file($this->filename, true);
     }
 
@@ -39,13 +42,13 @@ class TIniFileEx {
      * @param $file
      * @return bool
      */
-    function loadFromFile($file){
+    function loadFromFile($file)
+    {
         $result = true;
         $this->filename = $file;
-        if (file_exists($file) && is_readable($file)){
+        if (file_exists($file) && is_readable($file)) {
             $this->initArray();
-        }
-        else
+        } else
             $result = false;
         return $result;
     }
@@ -57,8 +60,9 @@ class TIniFileEx {
      * @param string $def значение возвращающие по умолчанию
      * @return string
      */
-    function read($section, $key, $def = ''){
-        if (isset($this->arr[$section][$key])){
+    function read($section, $key, $def = '')
+    {
+        if (isset($this->arr[$section][$key])) {
             return $this->arr[$section][$key];
         } else
             return $def;
@@ -70,7 +74,8 @@ class TIniFileEx {
      * @param $key
      * @param $value
      */
-    function write($section, $key, $value){
+    function write($section, $key, $value)
+    {
         if (is_bool($value))
             $value = $value ? 1 : 0;
         $this->arr[$section][$key] = $value;
@@ -80,12 +85,13 @@ class TIniFileEx {
      * Записывает все строки в файл
      * @return bool
      */
-    function updateFile(){
+    function updateFile()
+    {
         $result = '';
-        foreach ($this->arr as $sname=>$section){
+        foreach ($this->arr as $sname => $section) {
             $result .= '[' . $sname . ']' . _BR_;
-            foreach ($section as $key=>$value){
-                $result .= $key .'='.$value . _BR_;
+            foreach ($section as $key => $value) {
+                $result .= $key . '=' . $value . _BR_;
             }
             $result .= _BR_;
         }
@@ -98,7 +104,8 @@ class TIniFileEx {
     /**
      *TIniFileEx destruct
      */
-    function __destruct(){
+    function __destruct()
+    {
         $this->updateFile();
     }
 }

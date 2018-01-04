@@ -4,8 +4,8 @@ namespace bitly;
 
 use exceptions\ShortLinkNotFoundedException;
 
-require_once(__DIR__."/BitlyConnection.php");
-require_once(__DIR__."/../exceptions/ShortLinkNotFoundedException.php");
+require_once(__DIR__ . "/BitlyConnection.php");
+require_once(__DIR__ . "/../exceptions/ShortLinkNotFoundedException.php");
 
 /**
  * Class RestApi
@@ -37,7 +37,7 @@ class RestApi
      */
     public function __construct()
     {
-        $config = \parse_ini_file(__DIR__."/config.ini");
+        $config = \parse_ini_file(__DIR__ . "/config.ini");
         $this->connection = new \BitlyConnection($config['token']);
     }
 
@@ -84,7 +84,7 @@ class RestApi
      * @param string $url Ссылка
      * @return string Ссылка с добавленным протоколом
      */
-    public function addHttp ($url)
+    public function addHttp($url)
     {
         if (!preg_match('/^https?:\/\//', $url)) {
             return "http://" . $url;

@@ -1,4 +1,5 @@
 <?php
+
 namespace telegram;
 
 /**
@@ -24,7 +25,7 @@ class Connection
      */
     public function __construct($token, $url)
     {
-        $this->url = $url.$token;
+        $this->url = $url . $token;
     }
 
     /**
@@ -35,9 +36,9 @@ class Connection
      * @param array $params Отправляемые параметры
      * @return array Массив ответа
      */
-    public function request($method, $params=[])
+    public function request($method, $params = [])
     {
-        $url=$this->url."/$method";
+        $url = $this->url . "/$method";
         $vars = null;
         if (!empty($params)) {
             $vars = http_build_query($params);
@@ -45,13 +46,13 @@ class Connection
 
         $options = array(
             'http' => array(
-                'method'  => 'POST',  // метод передачи данных
-                'header'  => 'Content-type: application/x-www-form-urlencoded',  // заголовок
+                'method' => 'POST',  // метод передачи данных
+                'header' => 'Content-type: application/x-www-form-urlencoded',  // заголовок
                 'content' => $vars,  // переменные
             )
         );
 
-        $context  = stream_context_create($options);  // создаём контекст потока
+        $context = stream_context_create($options);  // создаём контекст потока
         $result = file_get_contents($url, false, $context); //отправляем запрос
 
         return json_decode($result);

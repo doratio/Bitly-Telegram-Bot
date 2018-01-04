@@ -50,6 +50,6 @@ class FLogger extends Logger
      */
     public function log($textLog)
     {
-        fputs($this->file,date('F Y H:i:s')."\n".$textLog . "\n\n");
+        fputs($this->file, date('F Y H:i:s') . "\n" . $textLog . "\n\n");
     }
 }
