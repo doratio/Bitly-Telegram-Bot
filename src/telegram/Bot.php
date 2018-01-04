@@ -2,11 +2,14 @@
 namespace telegram;
 
 use bitly\RestApi;
+use exceptions\FormatException;
+use exceptions\ShortLinkNotFoundedException;
 
 require('telegram/Connection.php');
 require('Log/FLogger.php');
 require('TIniFileEx.php');
 require('bitly/RestApi.php');
+require_once("exceptions/FormatException.php");
 
 class Bot
 {
@@ -51,6 +54,7 @@ class Bot
     {
         $params["text"] = $text;
         $params["chat_id"] = $chatID;
+        $params["disable_web_page_preview"] = true;
 
         $this->connection->request("sendmessage", $params);
     }
@@ -75,6 +79,26 @@ class Bot
         $params["reply_markup"] = json_encode($inlineKeyboards);
 
         $this->connection->request("sendmessage", $params);
+    }
+
+    public function sendLink ($message, $chat_id)
+    {
+        try {
+            if (preg_match('/^(https?:\/\/)?([\w\.]+)\.([a-z]{2,6}\.?)(\/[\w\.]*)*\/?$/', $message)) {
+                $this->sendMessage($this->bitlyApi->createBitlink($message), $chat_id);
+            } else if (
+                preg_match('/^(https?:\/\/)?bit\.ly(\/[\w\.]*)*\/?$/', $message) ||
+                preg_match('/https?:\/\/j\.mp(\/[\w\.]*)*\/?$/', $message)
+            ) {
+                $this->sendMessage($this->bitlyApi->expand($message), $chat_id);
+            } else {
+                throw new FormatException('Неверный формат ссылки');
+            }
+        } catch (ShortLinkNotFoundedException $e) {
+            $this->sendMessage($e->getMessage(), $chat_id);
+        } catch (FormatException $e) {
+            $this->sendMessage($e->getMessage(), $chat_id);
+        }
     }
 
     public function run()
@@ -135,7 +159,7 @@ class Bot
                             $content .= $i['title'] . "\n";
                             $content .= "🔗 " . $i['long_url'] ."\n\n". "➡ ". $i['link'] . "\n---------\n";
                         }
-                        
+
                         $inlineKeyboards = [
                             "inline_keyboard" => [
                                 [
@@ -161,9 +185,9 @@ class Bot
                         $this->sendMessage("помощь", $chat_id);
                         $this->log->log("сообщение отправлено");
                         break;
-
                     default:
                         $this->log->log("отправляем сообщение");
+                        $this->sendLink($message, $chat_id);
                         $this->log->log("сообщение отправлено");
                 }
             }
@@ -173,7 +197,6 @@ class Bot
                 $this->config->write('main', "lastUpdateID", $this->lastupdate);
                 $this->config->updateFile();
             }
-
             sleep(1);
         }
     }

@@ -2,8 +2,10 @@
 
 namespace bitly;
 
+use exceptions\ShortLinkNotFoundedException;
+
 require("bitly/BitlyConnection.php");
-require_once("exceptions/ShortLinkNotFounded.php");
+require_once("exceptions/ShortLinkNotFoundedException.php");
 
 /**
  * Class RestApi
@@ -58,12 +60,17 @@ class RestApi
      *
      * @param $shortUrl Сокращенная ссылка bit.ly или другого вида
      * @return string Исходная ссылка, для которой создавалась сокращенная
+     * @throws ShortLinkNotFoundedException
      */
     public function expand($shortUrl)
     {
-        return $this->connection->request("v3/link/info", [
+        $link = $this->connection->request("v3/link/info", [
             'link' => $shortUrl
         ])['data']['canonical_url'];
+        if (empty($link)) {
+            throw new ShortLinkNotFoundedException('Ссылка не найдена');
+        }
+        return $link;
     }
 
     /**
@@ -76,9 +83,11 @@ class RestApi
      */
     public function createBitlink($url)
     {
-        return $this->connection->request("v3/user/link_save", [
+        $res = $this->connection->request("v3/user/link_save", [
             'longUrl' => $url
-        ])['data']['link_save']['link'];
+        ]);
+        print_r($res);
+        return $res['data']['link_save']['link'];
     }
 
 }
