@@ -6,11 +6,11 @@ use bitly\RestApi;
 use exceptions\FormatException;
 use exceptions\ShortLinkNotFoundedException;
 
-require('telegram/Connection.php');
 require('Log/FLogger.php');
 require('TIniFileEx.php');
 require('bitly/RestApi.php');
 require_once("exceptions/FormatException.php");
+require_once('telegram/BotApi.php');
 
 /**
  * Class Bot
@@ -23,10 +23,6 @@ class Bot
 {
 
     /**
-     * @var Connection
-     */
-    private $connection;
-    /**
      * @var \FLogger Логгер
      */
     private $log;
@@ -34,10 +30,6 @@ class Bot
      * @var \TIniFileEx
      */
     private $config;
-    /**
-     * @var \TIniFileEx
-     */
-    private $configTelegram;
     /**
      * @var string
      */
@@ -87,112 +79,14 @@ class Bot
             ]
         ];
         $this->bitlyApi = new RestApi();
+        $this->botApi = new BotApi();
+
         $this->users = new \TIniFileEx("Log/users.ini");
         $this->config = new \TIniFileEx("config.ini");
-        $this->configTelegram = new \TIniFileEx("telegram/config.ini");
 
         $this->log = new \FLogger($this->config->read('main', "logFile"));
         $this->lastupdate = $this->config->read('main', "lastUpdateID");
-
-        $this->connection = new Connection(
-            $this->configTelegram->read('telegram', 'token'),
-            $this->configTelegram->read('telegram', 'URL')
-        );
     }
-
-    /**
-     *
-     * Возвращает все последние обновления
-     *
-     * @param $offset Отступ
-     * @return array Массив ответа
-     */
-    public function getUpdates($offset)
-    {
-        $params = null;
-        if (!empty($offset)) {
-            $params["offset"] = $offset;
-        }
-        return $this->connection->request("getUpdates", $params);
-    }
-
-    /**
-     *
-     * Отправляет сообщение пользователю
-     *
-     * @param string $text Тест сообщения
-     * @param string $chatID Идентификатор чата
-     */
-    public function sendMessage($text, $chatID)
-    {
-        $params["text"] = $text;
-        $params["chat_id"] = $chatID;
-        $params["disable_web_page_preview"] = true;
-
-        $this->connection->request("sendmessage", $params);
-    }
-
-    /**
-     *
-     * Выводит кнопки пользователю
-     *
-     * @param string $text Текст сообщения ообщение
-     * @param string $chatID Идентификатор чата
-     * @param array $keyboards Массив кнопок
-     * @param array $settings Массив настроек
-     */
-    public function keyboard($text, $chatID, $keyboards, $settings)
-    {
-        $replyMarkup = $settings;
-        $replyMarkup["keyboard"] = $keyboards;
-        $this->log->log(json_encode($replyMarkup));
-        $params["disable_web_page_preview"] = true;
-        $params["text"] = $text;
-        $params["chat_id"] = $chatID;
-        $params["reply_markup"] = json_encode($replyMarkup);
-
-        $this->connection->request("sendmessage", $params);
-    }
-
-    /**
-     *
-     * Выводит кнопки в сообщении
-     *
-     * @param string $text Текст кнопки
-     * @param string $chatID Идентификатор чата
-     * @param string $inlineKeyboards Массив кнопок
-     */
-    public function inlineKeyboard($text, $chatID, $inlineKeyboards)
-    {
-        $this->log->log(json_encode($inlineKeyboards));
-        $params["text"] = $text;
-        $params["chat_id"] = $chatID;
-        $params["reply_markup"] = json_encode($inlineKeyboards);
-        $params["disable_web_page_preview"] = true;
-
-        $this->connection->request("sendmessage", $params);
-    }
-
-    /**
-     *
-     * Редактирование сообщения
-     *
-     * @param string $message новый текст
-     * @param string $chat_id Идентификатор чата
-     * @param string $message_id Идентификатор сообщения
-     * @param string $inlineKeyboards Массив кнопок
-     */
-    public function editMessageText($message, $chat_id, $message_id, $inlineKeyboards)
-    {
-        $params["chat_id"] = $chat_id;
-        $params["message_id"] = $message_id;
-        $params["text"] = $message;
-        $params["disable_web_page_preview"] = true;
-        $params["reply_markup"] = json_encode($inlineKeyboards);
-
-        $this->connection->request("editMessageText", $params);
-    }
-
 
     /**
      *
@@ -208,16 +102,16 @@ class Bot
                 preg_match('/^(https?:\/\/)?bit\.ly(\/[\w\.]*)*\/?$/', $message) ||
                 preg_match('/^(https?:\/\/)?j\.mp(\/[\w\.]*)*\/?$/', $message)
             ) {
-                $this->sendMessage($this->bitlyApi->expand($message), $chat_id);
+                $this->botApi->sendMessage($this->bitlyApi->expand($message), $chat_id);
             } else if (preg_match('/^(https?:\/\/)?([\w\.]+)\.([a-z]{2,6}\.?)(\/[\w&?=\-\.]*)*\/?$/', $message)) {
-                $this->sendMessage($this->bitlyApi->createBitlink($message), $chat_id);
+                $this->botApi->sendMessage($this->bitlyApi->createBitlink($message), $chat_id);
             } else {
                 throw new FormatException('Неверный формат ссылки');
             }
         } catch (ShortLinkNotFoundedException $e) {
-            $this->sendMessage($e->getMessage(), $chat_id);
+            $this->botApi->sendMessage($e->getMessage(), $chat_id);
         } catch (FormatException $e) {
-            $this->sendMessage($e->getMessage(), $chat_id);
+            $this->botApi->sendMessage($e->getMessage(), $chat_id);
         }
     }
 
@@ -225,7 +119,7 @@ class Bot
      *
      * Возвращает отформатированную строку списка истории
      *
-     * @param $history Массив ссылок
+     * @param array $history Массив ссылок
      * @return string Отформатированная строка со списком ссылок
      */
     private function renderHistory($history)
@@ -245,7 +139,7 @@ class Bot
     {
         while (true) {
             $this->log->log("запрос на обновление");
-            $updates = ((array)$this->getUpdates($this->lastupdate))["result"];
+            $updates = ((array)$this->botApi->getUpdates($this->lastupdate))["result"];
             $this->log->log("запрос прошел");
 
             echo "<pre>";
@@ -259,7 +153,6 @@ class Bot
 
             foreach ($updates as $update) {
                 $update_id = ((array)$update)["update_id"];
-                var_dump(((array)$update)["callback_query"]);
                 if (((array)$update)["callback_query"] === null) {
                     $have_callback_query = false;
                     $chat = ((array)((array)$update)["message"])["chat"];
@@ -288,7 +181,7 @@ class Bot
                         $keyboardSettings = array(
                             "resize_keyboard" => true,
                         );
-                        $this->keyboard($this->tutorial, $chat_id, $keyboards, $keyboardSettings);
+                        $this->botApi->keyboard($this->tutorial, $chat_id, $keyboards, $keyboardSettings);
                         $this->log->log("клавиатура создана");
                         break;
 
@@ -299,14 +192,14 @@ class Bot
 
                         $content = $this->renderHistory($history);
 
-                        $this->inlineKeyboard($content, $chat_id, $this->inlineKeyboards);
+                        $this->botApi->inlineKeyboard($content, $chat_id, $this->inlineKeyboards);
                         $this->log->log("ярлык создан");
                         break;
 
                     case "/help":
                     case "Помощь":
                         $this->log->log("отправляем сообщение");
-                        $this->sendMessage($this->tutorial, $chat_id);
+                        $this->botApi->sendMessage($this->tutorial, $chat_id);
                         $this->log->log("сообщение отправлено");
                         break;
 
@@ -323,9 +216,9 @@ class Bot
 
                             $content = $this->renderHistory($history);
 
-                            $this->editMessageText($content, $chat_id, $message_id, $this->inlineKeyboards);
+                            $this->botApi->editMessageText($content, $chat_id, $message_id, $this->inlineKeyboards);
                         } else {
-                            $this->sendMessage('Неверный формат ссылки', $chat_id);
+                            $this->botApi->sendMessage('Неверный формат ссылки', $chat_id);
                         }
                         break;
 
@@ -345,9 +238,9 @@ class Bot
 
                             $content = $this->renderHistory($history);
 
-                            $this->editMessageText($content, $chat_id, $message_id, $this->inlineKeyboards);
+                            $this->botApi->editMessageText($content, $chat_id, $message_id, $this->inlineKeyboards);
                         } else {
-                            $this->sendMessage('Неверный формат ссылки', $chat_id);
+                            $this->botApi->sendMessage('Неверный формат ссылки', $chat_id);
                         }
                         break;
 
@@ -371,8 +264,8 @@ class Bot
      *
      * Получает информацию о пользователях
      *
-     * @param $user информация о пользователе
-     * @return $chat_id Идентификатор чата
+     * @param array $user информация о пользователе
+     * @param string $chat_id Идентификатор чата
      */
     public function infoAboutU($user, $chat_id)
     {
