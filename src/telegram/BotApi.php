@@ -32,7 +32,7 @@ class BotApi
      */
     public function __construct()
     {
-        $this->configTelegram = new \TIniFileEx("telegram/config.ini");
+        $this->configTelegram = new \TIniFileEx("../src/telegram/config.ini");
 
         $this->connection = new Connection(
             $this->configTelegram->read('telegram', 'token'),
@@ -47,7 +47,7 @@ class BotApi
      * @param $offset Отступ
      * @return array Массив ответа
      */
-    public function getUpdates($offset)
+    public function getUpdates($offset = null)
     {
         $params = null;
         if (!empty($offset)) {

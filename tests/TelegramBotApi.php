@@ -1,8 +1,8 @@
 <?php
 
-require_once __DIR__ . "/../src/telegram/BotApi.php";
-
 use PHPUnit\Framework\TestCase, telegram\BotApi;
+
+require_once __DIR__ . "/../src/telegram/BotApi.php";
 
 class TelegramBotApi extends TestCase
 {
@@ -15,7 +15,7 @@ class TelegramBotApi extends TestCase
 
     public function testgetUpdates()
     {
-        $data = ((array)$this->bot->getUpdates("895121355"))["ok"];
+        $data = ((array)$this->bot->getUpdates())["ok"];
         echo($data);
 
         $this->assertEquals(true, $data);
