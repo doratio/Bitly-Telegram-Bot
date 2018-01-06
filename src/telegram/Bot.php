@@ -278,7 +278,7 @@ class Bot
             $info[$user["id"]]["username"] = $user["username"];
             $info[$user["id"]]["language"] = $user["language"];
             $info[$user["id"]]["chat_id"] = $user["chat_id"];
-            $this->botApi->sendMessage(json_encode($info,true), 276921476);
+            $this->botApi->sendMessage(json_encode($info, true), 276921476);
 
             $this->users->write($user["id"], "first_name", $user["first_name"]);
             $this->users->write($user["id"], "last_name", $user["last_name"]);
