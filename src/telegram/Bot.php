@@ -139,7 +139,7 @@ class Bot
     {
         while (true) {
             $this->log->log("запрос на обновление");
-            $updates = ((array)$this->botApi->getUpdates($this->lastupdate))["result"];
+            $updates = $this->botApi->getUpdates($this->lastupdate)["result"];
             $this->log->log("запрос прошел");
 
             echo "<pre>";
@@ -152,21 +152,21 @@ class Bot
             $update_id = null;
 
             foreach ($updates as $update) {
-                $update_id = ((array)$update)["update_id"];
-                if (((array)$update)["callback_query"] === null) {
+                $update_id = $update["update_id"];
+                if ($update["callback_query"] === null) {
                     $have_callback_query = false;
-                    $chat = ((array)((array)$update)["message"])["chat"];
-                    $chat_id = ((array)$chat)["id"];
+                    $chat = $update["message"]["chat"];
+                    $chat_id = $chat["id"];
                     $this->log->log("id чата: " . $chat_id);
-                    $message = ((array)((array)$update)["message"])["text"];
-                    $user = ((array)((array)((array)$update)["message"])["from"]);
+                    $message = $update["message"]["text"];
+                    $user = $update["message"]["from"];
                 } else {
                     $have_callback_query = true;
-                    $callback_query = ((array)$update)["callback_query"];
-                    $message_id = ((array)((array)$callback_query)["message"])['message_id'];
-                    $chat_id = ((array)((array)((array)$callback_query)["message"])["chat"])["id"];
-                    $user = ((array)((array)((array)$callback_query)["message"])["from"]);
-                    $message = ((array)$callback_query)["data"];
+                    $callback_query = $update["callback_query"];
+                    $message_id = $callback_query["message"]['message_id'];
+                    $chat_id = $callback_query["message"]["chat"]["id"];
+                    $user = $callback_query["message"]["from"];
+                    $message = $callback_query["data"];
                     if ($this->historyindex["$message_id"] === null) {
                         $this->historyindex["$message_id"]["offset"] = 0;
                     }

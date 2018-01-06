@@ -15,7 +15,7 @@ class TelegramBotApi extends TestCase
 
     public function testgetUpdates()
     {
-        $data = ((array)$this->bot->getUpdates())["ok"];
+        $data = $this->bot->getUpdates()["ok"];
         echo($data);
 
         $this->assertEquals(true, $data);

@@ -55,6 +55,6 @@ class Connection
         $context = stream_context_create($options);  // создаём контекст потока
         $result = file_get_contents($url, false, $context); //отправляем запрос
 
-        return json_decode($result);
+        return json_decode($result, true);
     }
 }
